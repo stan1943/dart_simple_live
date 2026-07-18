@@ -4,7 +4,7 @@ on:
     tags:
       - "v*"
 jobs:
-  build-android:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -12,16 +12,20 @@ jobs:
         with:
           distribution: "zulu"
           java-version: "17"
-      - uses: subosito/flutter-action@v2
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
         with:
-          channel: "stable"
-      - name: Build APK
+          channel: stable
+      - name: Install dependencies
         run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
           cd simple_live_app
           flutter pub get
-          flutter build apk --release
+      - name: Build APK
+        run: |
+          cd simple_live_app
+          flutter build apk --release --verbose 2>&1 | tail -50
       - uses: actions/upload-artifact@v4
+        if: success()
         with:
           name: simple-live-app
           path: simple_live_app/build/app/outputs/flutter-apk/*.apk
