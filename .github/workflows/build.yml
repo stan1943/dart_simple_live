@@ -1,4 +1,4 @@
-name: app-build-action
+name: Build APK
 on:
   push:
     tags:
@@ -8,25 +8,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: master
       - uses: actions/setup-java@v4
         with:
           distribution: "zulu"
           java-version: "17"
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.38.x"
-      - name: Restore packages
+          channel: "stable"
+      - name: Build
         run: |
           cd simple_live_app
           flutter pub get
-      - name: Build APK
-        run: |
-          cd simple_live_app
           flutter build apk --release
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: simple-live-app-unsigned
+          name: simple-live-app
           path: simple_live_app/build/app/outputs/flutter-apk/*.apk
