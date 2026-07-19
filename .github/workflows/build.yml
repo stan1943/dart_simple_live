@@ -16,16 +16,12 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-      - name: Install dependencies
-        run: |
-          cd simple_live_app
-          flutter pub get
       - name: Build APK
         run: |
           cd simple_live_app
-          flutter build apk --release --verbose 2>&1 | tail -50
+          flutter pub get
+          flutter build apk --release
       - uses: actions/upload-artifact@v4
-        if: success()
         with:
           name: simple-live-app
-          path: simple_live_app/build/app/outputs/flutter-apk/*.apk
+          path: simple_live_app/build/app/outputs/apk/release/*.apk
