@@ -16,20 +16,12 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
-      - name: Create keystore
-        run: |
-          cd simple_live_app/android
-          keytool -genkey -v -keystore release.keystore -alias release -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=,OU=,O=,L=,S=,C="
-          echo "storeFile=release.keystore" > key.properties
-          echo "storePassword=android" >> key.properties
-          echo "keyPassword=android" >> key.properties
-          echo "keyAlias=release" >> key.properties
       - name: Build APK
         run: |
           cd simple_live_app
           flutter pub get
-          flutter build apk --release
+          flutter build apk --debug
       - uses: actions/upload-artifact@v4
         with:
-          name: simple-live-app
-          path: simple_live_app/build/app/outputs/apk/release/*.apk
+          name: simple-live-app-debug
+          path: simple_live_app/build/app/outputs/apk/debug/*.apk
