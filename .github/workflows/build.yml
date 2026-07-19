@@ -16,26 +16,23 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+      - name: Create keystore
+        run: |
+          cd simple_live_app/android
+          # Generate a debug keystore using Java keytool
+          keytool -genkey -v -keystore debug.keystore -alias debug -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Debug, OU=, O=, L=, S=, C=" 2>/dev/null
+          ls -la debug.keystore
+      - name: Modify build.gradle for debug signing
+        run: |
+          cd simple_live_app/android
+          # Replace the signing config to use debug keystore
+          sed -i 's/signingConfigs\.getByName("release")/signingConfigs.getByName("debug")/' app/build.gradle.kts
       - name: Build APK
         run: |
           cd simple_live_app
-          flutter pub get 2>&1 | tee /tmp/pub_output.txt
-          flutter build apk --debug 2>&1 | tee /tmp/build_output.txt
-          exit ${PIPESTATUS[0]}
-      - name: Save build logs
-        if: failure()
-        run: |
-          cat /tmp/pub_output.txt
-          cat /tmp/build_output.txt
+          flutter pub get
+          flutter build apk --debug
       - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: build-logs
-          path: |
-            /tmp/pub_output.txt
-            /tmp/build_output.txt
-      - uses: actions/upload-artifact@v4
-        if: success()
         with:
           name: simple-live-app
           path: simple_live_app/build/app/outputs/apk/debug/*.apk
