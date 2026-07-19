@@ -16,6 +16,10 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: "3.27.x"
+      - name: Accept Android licenses
+        run: |
+          yes | flutter doctor --android-licenses 2>/dev/null || true
       - name: Build APK
         run: |
           cd simple_live_app
@@ -23,5 +27,5 @@ jobs:
           flutter build apk --debug
       - uses: actions/upload-artifact@v4
         with:
-          name: simple-live-app-debug
+          name: simple-live-app
           path: simple_live_app/build/app/outputs/apk/debug/*.apk
